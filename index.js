@@ -11,10 +11,10 @@ const pool = new Pool(
     }
 );
   
-// pool.connect();
+pool.connect();
 
-function init() {
-    inquirer.prompt([
+async function init() {
+    const data = await inquirer.prompt([
         {
             type: 'list',
             message: 'What would you like to do?',
@@ -29,29 +29,28 @@ function init() {
                 'Quit'
             ]
         }
-    ]).then((data) => {
-        switch (data.action) {
-            case 'View All Employees':
-            case 'View All Roles':
-            case 'View All Departments':
-                const table = data.action.split(' ')[2].toLowerCase();
-                pool.query(`SELECT * FROM ${table}`, (err, {rows}) => {
-                    console.log(rows);
-                });
-                break;
-            case 'Add Employee':
-                break;
-            case 'Update Employee Role':
-                break;
-            case 'Add Role':
-                break;
-            case 'Add Department':
-                break;
-            case 'Quit':
-                return;
-        }
-        init();
-    });
+    ])
+switch (data.action) {
+    case 'View All Employees':
+    case 'View All Roles':
+    case 'View All Departments':
+        const table = data.action.split(' ')[2].toLowerCase();
+        pool.query(`SELECT * FROM ${table}`, (err, {rows}) => {
+            console.log(rows);
+        });
+        break;
+    case 'Add Employee':
+        break;
+    case 'Update Employee Role':
+        break;
+    case 'Add Role':
+        break;
+    case 'Add Department':
+        break;
+    case 'Quit':
+        process.exit(1);
+}
+init();
 }
 
 // Function call to initialize app
