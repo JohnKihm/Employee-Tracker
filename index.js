@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const { Pool } = require('pg');
 require('dotenv').config();
+const { getDepartmentID } = require('./helpers/queryHandler')
 
 const pool = new Pool(
     {
@@ -47,8 +48,8 @@ switch (action) {
         break;
     case 'Update Employee Role':
         break;
-    case 'Add Role':{
-        const data = await inquirer.prompt([
+    case 'Add Role':
+        const roleData = await inquirer.prompt([
             {
                 type: 'input',
                 message: 'What is the name of the role?',
@@ -65,29 +66,29 @@ switch (action) {
                 name: 'department'
             }
         ]);
-        const { roleName, salary, department } = data;
-        const sql = `INSERT INTO roles () VALUES ($1)`;
-        await pool.query(sql, [], (err, { rows }) => {
+        const { roleName, salary, department } = roleData;
+        const departmentID = await getDepartmentID(department);
+        const insertValues = `(${roleName}, ${salary}, ${departmentID})`
+        const roleQuery = `INSERT INTO roles (title, salary, department_id) VALUES ($1)`;
+        await pool.query(roleQuery, [insertValues], (err, { rows }) => {
             if (err) console.error(err);
         });
         console.log(`Added ${roleName} to the database`);
-    }
         break;
-    case 'Add Department':{
-        const data = await inquirer.prompt(
+    case 'Add Department':
+        const departmentData = await inquirer.prompt(
             {
                 type: 'input',
                 message: 'What is the name of the department?',
                 name: 'departmentName'
             }
         );
-        const { departmentName } = data;
-        const sql = `INSERT INTO departments (name) VALUES ($1)`;
-        await pool.query(sql, [departmentName], (err, { rows }) => {
+        const departmentName = departmentData.departmentName;
+        const departmentQuery = `INSERT INTO departments (name) VALUES ($1)`;
+        await pool.query(departmentQuery, [departmentName], (err, { rows }) => {
             if (err) console.error(err);
         });
         console.log(`Added ${departmentName} to the database`);
-    }
         break;
     case 'Quit':
         process.exit(1);
