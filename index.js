@@ -14,7 +14,7 @@ const pool = new Pool(
 pool.connect();
 
 async function init() {
-    const data = await inquirer.prompt([
+    let action = await inquirer.prompt(
         {
             type: 'list',
             message: 'What would you like to do?',
@@ -29,15 +29,19 @@ async function init() {
                 'Quit'
             ]
         }
-    ])
-switch (data.action) {
+    );
+    action = action.action;
+switch (action) {
     case 'View All Employees':
     case 'View All Roles':
     case 'View All Departments':
-        const table = data.action.split(' ')[2].toLowerCase();
-        pool.query(`SELECT * FROM ${table}`, (err, {rows}) => {
-            console.log(rows);
-        });
+        const table = action.split(' ')[2].toLowerCase();
+        // const query = {
+        //     text: `SELECT * FROM ${table}`,
+        //     rowMode: 'array'
+        // }
+        const res = await pool.query(`SELECT * FROM ${table}`);
+        console.log(res.rows);
         break;
     case 'Add Employee':
         break;
@@ -46,6 +50,19 @@ switch (data.action) {
     case 'Add Role':
         break;
     case 'Add Department':
+        const data = await inquirer.prompt(
+            {
+                type: 'input',
+                message: 'What is the name of the department?',
+                name: 'departmentName'
+            }
+        );
+        const departmentName = data.departmentName;
+        const sql = `INSERT INTO departments (name) VALUES ($1)`;
+        await pool.query(sql, [departmentName], (err, { rows }) => {
+            if (err) console.error(err);
+        });
+        console.log(`Added ${departmentName} to the database`);
         break;
     case 'Quit':
         process.exit(1);
