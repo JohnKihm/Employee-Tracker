@@ -47,9 +47,33 @@ switch (action) {
         break;
     case 'Update Employee Role':
         break;
-    case 'Add Role':
+    case 'Add Role':{
+        const data = await inquirer.prompt([
+            {
+                type: 'input',
+                message: 'What is the name of the role?',
+                name: 'roleName'
+            },
+            {
+                type: 'input',
+                message: 'What is the salary of the role?',
+                name: 'salary'
+            },
+            {
+                type: 'input',
+                message: 'Which department does the role belong to?',
+                name: 'department'
+            }
+        ]);
+        const { roleName, salary, department } = data;
+        const sql = `INSERT INTO roles () VALUES ($1)`;
+        await pool.query(sql, [], (err, { rows }) => {
+            if (err) console.error(err);
+        });
+        console.log(`Added ${roleName} to the database`);
+    }
         break;
-    case 'Add Department':
+    case 'Add Department':{
         const data = await inquirer.prompt(
             {
                 type: 'input',
@@ -57,12 +81,13 @@ switch (action) {
                 name: 'departmentName'
             }
         );
-        const departmentName = data.departmentName;
+        const { departmentName } = data;
         const sql = `INSERT INTO departments (name) VALUES ($1)`;
         await pool.query(sql, [departmentName], (err, { rows }) => {
             if (err) console.error(err);
         });
         console.log(`Added ${departmentName} to the database`);
+    }
         break;
     case 'Quit':
         process.exit(1);
