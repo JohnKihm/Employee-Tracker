@@ -37,12 +37,8 @@ switch (action) {
     case 'View All Roles':
     case 'View All Departments':
         const table = action.split(' ')[2].toLowerCase();
-        // const query = {
-        //     text: `SELECT * FROM ${table}`,
-        //     rowMode: 'array'
-        // }
         const res = await pool.query(`SELECT * FROM ${table}`);
-        console.log(res.rows);
+        console.table(res.rows);
         break;
     case 'Add Employee':
         const employeeData = await inquirer.prompt([
