@@ -19,19 +19,17 @@ async function getDepartmentID(name) {
 }
 
 async function addDepartment(name) {
-    const text = `INSERT INTO departments (name) VALUES ($1)`;
-    await pool.query(text, [name], (err, { rows }) => {
-        if (err) console.error(err);
-    });
+    const text = `INSERT INTO departments(name) VALUES($1)`;
+    const values = [name];
+    await pool.query(text, values);
     return;
 }
 
 async function addRole(title, salary, departmentID) {
     const text = `INSERT INTO roles (title, salary, department_id) VALUES ($1, $2, $3)`;
     const values = [title, salary, departmentID]
-    await pool.query(text, values, (err, { rows }) => {
-        if (err) console.error(err);
-    });
+    await pool.query(text, values);
+    return;
 }
 
 module.exports = { getDepartmentID, addDepartment, addRole };
