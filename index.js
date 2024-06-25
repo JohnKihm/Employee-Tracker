@@ -37,8 +37,8 @@ switch (action) {
     case 'View All Roles':
     case 'View All Departments':
         const table = action.split(' ')[2].toLowerCase();
-        const res = await pool.query(`SELECT * FROM ${table}`);
-        console.table(res.rows);
+        const res = (await pool.query(`SELECT * FROM ${table}`)).rows;
+        console.table(res);
         break;
     case 'Add Employee':
         const employeeData = await inquirer.prompt([
@@ -70,6 +70,28 @@ switch (action) {
         console.log(`Added ${firstName + ' ' + lastName} to the database`);
         break;
     case 'Update Employee Role':
+        const roles = (await pool.query('SELECT title FROM roles')).rows;
+        for (let i = 0; i < roles.length; i++) {
+            roles[i] = roles[i].title;
+        }
+        const updateData = await inquirer.prompt([
+            {
+                type: 'input',
+                message: "Which employee's role do you want to update?",
+                name: 'employeeName'
+            },
+            {
+                type: 'list',
+                message: 'Which role do you want to assign to the selected employee?',
+                choices: roles,
+                name: 'newRole'
+            }
+        ]);
+        const { employeeName, newRole } = updateData;
+        const employeeID = await getID(employeeName, 'employees');
+        const newRoleID = await getID(newRole, 'roles', 'title');
+        await pool.query(`UPDATE employees SET role_id = ${newRoleID} WHERE id = ${employeeID}`);
+        console.log("Updated employee's role");
         break;
     case 'Add Role':
         const roleData = await inquirer.prompt([
