@@ -112,7 +112,7 @@ switch (action) {
             }
         ]);
         const { roleName, salary, department } = roleData;
-        const departmentID = await getID(department, 'departments');
+        const departmentID = await getID(department, 'departments', 'name');
         await addRole(roleName, salary, departmentID);
         console.log(`Added ${roleName} to the database`);
         break;
