@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const { Pool } = require('pg');
 require('dotenv').config();
-const { getDepartmentID } = require('./helpers/queryHandler')
+const { getDepartmentID, addDepartment, addRole } = require('./helpers/queryHandler')
 
 const pool = new Pool(
     {
@@ -68,11 +68,7 @@ switch (action) {
         ]);
         const { roleName, salary, department } = roleData;
         const departmentID = await getDepartmentID(department);
-        const insertValues = `(${roleName}, ${salary}, ${departmentID})`
-        const roleQuery = `INSERT INTO roles (title, salary, department_id) VALUES ($1)`;
-        await pool.query(roleQuery, [insertValues], (err, { rows }) => {
-            if (err) console.error(err);
-        });
+        await addRole(roleName, salary, departmentID);
         console.log(`Added ${roleName} to the database`);
         break;
     case 'Add Department':
@@ -84,10 +80,7 @@ switch (action) {
             }
         );
         const departmentName = departmentData.departmentName;
-        const departmentQuery = `INSERT INTO departments (name) VALUES ($1)`;
-        await pool.query(departmentQuery, [departmentName], (err, { rows }) => {
-            if (err) console.error(err);
-        });
+        await addDepartment(departmentName);
         console.log(`Added ${departmentName} to the database`);
         break;
     case 'Quit':
