@@ -1,7 +1,7 @@
 const inquirer = require('inquirer');
 const { Pool } = require('pg');
 require('dotenv').config();
-const { getDepartmentID, addDepartment, addRole } = require('./helpers/queryHandler')
+const { getID, addDepartment, addRole, addEmployee } = require('./helpers/queryHandler')
 
 const pool = new Pool(
     {
@@ -45,6 +45,33 @@ switch (action) {
         console.log(res.rows);
         break;
     case 'Add Employee':
+        const employeeData = await inquirer.prompt([
+            {
+                type: 'input',
+                message: "What is the employee's first name?",
+                name: 'firstName'
+            },
+            {
+                type: 'input',
+                message: "What is the employee's last name?",
+                name: 'lastName'
+            },
+            {
+                type: 'input',
+                message: "What is the employee's role?",
+                name: 'role'
+            },
+            {
+                type: 'input',
+                message: "Who is the employee's manager?",
+                name: 'manager'
+            }
+        ]);
+        const { firstName, lastName, role, manager } = employeeData;
+        const roleID = await getID(role, 'roles', 'title');
+        const managerID = await getID(manager, 'employees');
+        await addEmployee(firstName, lastName, roleID, managerID);
+        console.log(`Added ${firstName + ' ' + lastName} to the database`);
         break;
     case 'Update Employee Role':
         break;
@@ -67,7 +94,7 @@ switch (action) {
             }
         ]);
         const { roleName, salary, department } = roleData;
-        const departmentID = await getDepartmentID(department);
+        const departmentID = await getID(department, 'departments');
         await addRole(roleName, salary, departmentID);
         console.log(`Added ${roleName} to the database`);
         break;
